@@ -96,21 +96,21 @@ def context():
     draw = ImageDraw.Draw(image)
     draw.text((48, 36), "System context for Deskline", font=font(32, bold=True), fill="#1a1a1a")
 
-    person(draw, (60, 180, 420, 430), "Customer", "Asks a question and does not choose a section.")
+    person(draw, (60, 180, 420, 430), "Member of the public", "Asks about an administrative process and does not choose a section.")
     person(draw, (60, 560, 420, 810), "Section staff", "Reads a ticket and the reason it was opened.")
     card(
         draw,
         (760, 300, 1360, 700),
         SYSTEM,
         "Deskline",
-        "Routes a question to Returns, Warranties, or Repairs, then cites that section or opens a ticket.",
+        "Routes a question to Appointments, Referrals and Waiting, or Records and Results, then cites that section or opens a ticket. It does not give clinical advice.",
     )
     card(
         draw,
         (1660, 150, 2060, 430),
         EXTERNAL,
-        "Halfords website",
-        "Publishes the returns, warranty, and terms pages. Copyright stays with Halfords.",
+        "Policy websites",
+        "Publish the approved appointment, referral, and records pages. Deskline is not an NHS service.",
     )
     card(
         draw,
@@ -121,9 +121,9 @@ def context():
     )
 
     arrow(draw, (420, 260), (760, 380), "Asks a question", (470, 250))
-    arrow(draw, (760, 520), (420, 400), "Answer, question, or ticket", (450, 450))
+    arrow(draw, (760, 520), (420, 400), "Answer, question, ticket, or signpost", (430, 450))
     arrow(draw, (420, 690), (760, 620), "Reads tickets", (470, 640))
-    arrow(draw, (1360, 400), (1660, 290), "Scrapes the listed pages once", (1380, 310))
+    arrow(draw, (1360, 400), (1660, 290), "Extracts the listed pages once", (1380, 310))
     arrow(draw, (1360, 600), (1660, 700), "Routes, grades, drafts, checks", (1380, 640))
 
     image.save("docs/images/context.png", "PNG")
@@ -138,15 +138,15 @@ def containers():
     rounded(draw, boundary, "#ffffff", BOUNDARY[0], radius=16, width=3)
     draw.text((584, 168), "Deskline, local", font=font(20, bold=True), fill=BOUNDARY[0])
 
-    person(draw, (40, 200, 400, 430), "Customer", "Asks a question.")
+    person(draw, (40, 200, 400, 430), "Member of the public", "Asks a question.")
     person(draw, (40, 520, 400, 750), "Section staff", "Reads tickets.")
     card(
         draw,
         (40, 900, 420, 1160),
         EXTERNAL,
         "Local corpus",
-        "One unmodified scrape of the listed Halfords pages. Gitignored JSON. Stays on this machine.",
-        tech="JSON files",
+        "Unmodified extracts of the approved policy pages. Gitignored. Stays on this machine.",
+        tech="Local files",
     )
     card(
         draw,
@@ -161,7 +161,7 @@ def containers():
         (700, 240, 1420, 430),
         CONTAINER,
         "API",
-        "Accepts a question and returns an answer, a clarifying question, or a ticket.",
+        "Accepts a question and returns an answer, a clarifying question, a ticket, or a signpost.",
         tech="Python",
     )
     card(
@@ -185,7 +185,7 @@ def containers():
         (1100, 820, 1480, 1080),
         CONTAINER,
         "Eval runner",
-        "Scores the frozen golden set. Run by hand. Not on the customer path.",
+        "Scores the frozen golden set. Run by hand. Not on the request path.",
         tech="Python, RAGAS",
     )
 

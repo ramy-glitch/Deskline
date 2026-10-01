@@ -1,2 +1,8 @@
-# Personal local scrape of Halfords help pages. Not for publication.
-data/corpus/
+# Raw scraped or extracted policy text. Local only. Not for publication.
+data/corpus/**
+!data/corpus/**/
+!data/corpus/**/.gitkeep
+
+# Workbench and secrets. Added before the environment exists so they cannot be committed by accident.
+.venv/
+.env
