@@ -213,7 +213,7 @@ The versions are pinned when the environment is created. They are not pinned in 
 
 | Library | Component it serves | Why this library |
 |---|---|---|
-| Python 3.12 | All of the Python process | LangChain, LangGraph, and RAGAS publish wheels for it. It is the language the rehearsed stack runs on. |
+| Python 3.13 | All of the Python process | LangChain, LangGraph, and RAGAS publish wheels for it. It is the interpreter on this machine, so the workbench and the API image use the same version. |
 | FastAPI | API | One typed HTTP entry. The endings are response shapes the tests can tell apart. |
 | Uvicorn | API | The process that serves FastAPI inside the API container. |
 | Pydantic | API | Describes the question and the responses. FastAPI already uses it, so the contract and the validation are the same objects. |
@@ -302,7 +302,7 @@ flowchart TB
 
 Planned when the environment is created, and not run from this plan:
 
-1. Install Python 3.12 and Docker Desktop if they are not already on the machine.
+1. Python 3.13 is already on this machine. Install Docker Desktop if it is not already there.
 2. Create the workbench with `python -m venv .venv`, then install the two dependency groups into it.
 3. Pin those installs in a lock file so the API image and the workbench use the same versions.
 4. Start PostgreSQL and Ollama with Docker Compose. Pull the two starting models into the Ollama volume.
