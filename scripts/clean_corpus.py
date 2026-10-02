@@ -14,6 +14,11 @@ TRAILERS = {
     "find out more about tests and treatments",
     "view more information about conditions",
     "get help in:",
+    "hospitals",
+    "article",
+    "northern ireland",
+    "scotland",
+    "wales",
 }
 
 
