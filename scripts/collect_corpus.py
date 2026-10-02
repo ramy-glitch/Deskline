@@ -1,4 +1,4 @@
-"""Collect the eighteen Alpha corpus pages. One known URL at a time."""
+"""Collect the Alpha corpus pages. One known URL at a time."""
 
 import json
 import time
@@ -114,8 +114,57 @@ PAGES = [
     },
     {
         "section": "records_results",
-        "title": "GP health record",
-        "url": "https://www.nhs.uk/nhs-app/help/health-records-in-the-nhs-app/gp-health-record/",
+        "title": "How to log in",
+        "url": "https://www.nhs.uk/nhs-app/help/logging-in/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Documents",
+        "url": "https://www.nhs.uk/nhs-app/help/documents/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Messages",
+        "url": "https://www.nhs.uk/nhs-app/help/messages/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Family and carer access",
+        "url": "https://www.nhs.uk/nhs-app/help/profile/family-and-carer-access/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Abbreviations",
+        "url": "https://www.nhs.uk/nhs-app/help/understanding-abbreviations/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Contact the NHS App team",
+        "url": "https://www.nhs.uk/contact-us/nhs-app-contact-us/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Get help for mental health now",
+        "url": "https://www.nhs.uk/mental-health/get-urgent-help-for-mental-health/",
+        "publisher": "NHS website",
+        "kind": "html",
+    },
+    {
+        "section": "records_results",
+        "title": "Get urgent medical help now",
+        "url": "https://111.nhs.uk/",
         "publisher": "NHS website",
         "kind": "html",
     },
