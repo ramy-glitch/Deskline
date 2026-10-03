@@ -17,6 +17,20 @@ services:
     volumes:
       - ollama_data:/root/.ollama
 
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      OLLAMA_BASE_URL: http://ollama:11434
+      CHAT_MODEL: ${CHAT_MODEL}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS}
+    depends_on:
+      - postgres
+      - ollama
+
 volumes:
   postgres_data:
   ollama_data:
