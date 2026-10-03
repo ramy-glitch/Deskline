@@ -6,3 +6,7 @@ data/corpus/**
 # Workbench and secrets. Added before the environment exists so they cannot be committed by accident.
 .venv/
 .env
+
+# Python cache.
+__pycache__/
+*.py[cod]

@@ -1,5 +1,6 @@
 """Load the approved pages once: split, embed, and store chunks."""
-
+import asyncio
+import sys
 import json
 from pathlib import Path
 
@@ -77,7 +78,7 @@ def load_pages() -> list[Document]:
         if not text_path.is_file():
             raise SystemExit(f"missing text file for {path.name}: {text_path}")
 
-        text = text_path.read_text(encoding="utf-8").strip()
+        text = text_path.read_text(encoding="utf-8").replace("\x00", "").strip()
         if not text:
             raise SystemExit(f"{text_path} is empty")
 
@@ -105,6 +106,9 @@ def main() -> None:
 
     ensure_sections(database_url)
     documents = load_pages()
+
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     engine = PGEngine.from_connection_string(database_url)
     try:
