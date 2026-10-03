@@ -247,7 +247,7 @@ The names live in configuration so they can be replaced without a change to the 
 
 | Setting | Starting value | Why this starting value |
 |---|---|---|
-| Chat model | `qwen2.5:7b` | An instruction model small enough to run on this machine for the Alpha. It is asked for a section label, a grade, a draft, and a yes-or-no check. |
+| Chat model | `qwen3:1.7b` | An instruction model already on this machine. It is asked for a section label, a grade, a draft, and a yes-or-no check. |
 | Embedding model | `nomic-embed-text` | A local embedding model. Its width is 768 numbers. The chunk column is created at that width. |
 | RAGAS judge | The same chat model | The judge reads the question, the passages, and the answer. Using the local model keeps that text on this machine. |
 

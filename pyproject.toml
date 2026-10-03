@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deskline"
+version = "0.1.0"
+description = "A learning simulation of a healthcare policy navigation assistant."
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "langgraph",
+    "langchain",
+    "langchain-text-splitters",
+    "langchain-postgres",
+    "psycopg[binary]",
+    "langchain-ollama",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+eval = [
+    "ragas",
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

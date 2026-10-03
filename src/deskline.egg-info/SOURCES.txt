@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+src/deskline/__init__.py
+src/deskline.egg-info/PKG-INFO
+src/deskline.egg-info/SOURCES.txt
+src/deskline.egg-info/dependency_links.txt
+src/deskline.egg-info/requires.txt
+src/deskline.egg-info/top_level.txt

@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: deskline
+Version: 0.1.0
+Summary: A learning simulation of a healthcare policy navigation assistant.
+Requires-Python: >=3.13
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: pydantic
+Requires-Dist: langgraph
+Requires-Dist: langchain
+Requires-Dist: langchain-text-splitters
+Requires-Dist: langchain-postgres
+Requires-Dist: psycopg[binary]
+Requires-Dist: langchain-ollama
+Requires-Dist: python-dotenv
+Provides-Extra: eval
+Requires-Dist: ragas; extra == "eval"
+Requires-Dist: pytest; extra == "eval"
+Requires-Dist: httpx; extra == "eval"
