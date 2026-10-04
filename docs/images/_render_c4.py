@@ -121,7 +121,7 @@ def context():
     )
 
     arrow(draw, (420, 260), (760, 380), "Asks a question", (470, 250))
-    arrow(draw, (760, 520), (420, 400), "Answer, question, ticket, or signpost", (430, 450))
+    arrow(draw, (760, 520), (420, 400), "Answer, ticket, or signpost", (430, 450))
     arrow(draw, (420, 690), (760, 620), "Reads tickets", (470, 640))
     arrow(draw, (1360, 400), (1660, 290), "Extracts the listed pages once", (1380, 310))
     arrow(draw, (1360, 600), (1660, 700), "Routes, grades, drafts, checks", (1380, 640))
@@ -161,7 +161,7 @@ def containers():
         (700, 240, 1420, 430),
         CONTAINER,
         "API",
-        "Accepts a question and returns an answer, a clarifying question, a ticket, or a signpost.",
+        "Accepts a question and returns an answer, a ticket, or a signpost.",
         tech="Python",
     )
     card(
@@ -169,7 +169,7 @@ def containers():
         (700, 500, 1420, 720),
         CONTAINER,
         "LangGraph application",
-        "Routes, asks once, retrieves, checks, and escalates. Runs inside the API process.",
+        "Routes, retrieves, checks, and escalates. Runs inside the API process.",
         tech="Python, LangGraph, LangChain",
     )
     card(

@@ -53,4 +53,4 @@ Application code is not written yet. The corpus is gathered first. Raw page text
 
 ## Build order
 
-The order is in [docs/alpha_build.md](docs/alpha_build.md): corpus, minimal cited answers, routing, clarification and escalation, isolation, evaluation, Docker UAT, then Azure. UAT is passed on this machine before any cloud rollout. The page text is not part of that rollout.
+The order is in [docs/alpha_build.md](docs/alpha_build.md): corpus, minimal cited answers, routing, escalation, isolation, evaluation, Docker UAT, then Azure. UAT is passed on this machine before any cloud rollout. The page text is not part of that rollout.

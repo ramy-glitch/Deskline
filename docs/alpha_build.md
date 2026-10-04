@@ -34,7 +34,7 @@ flowchart LR
     uat -->|A rule missed| alpha
 ```
 
-Discovery is already closed. This plan is the Alpha build. UAT is the script in discovery: route labels, two-turn clarifying cases, clinical-boundary cases, the leak test, and one RAGAS run on the frozen golden set. The faithfulness bar is 0.8, set before tuning. If the first honest run misses it, UAT has failed and Alpha continues. The bar stays where it is. The golden questions stay as they were written.
+Discovery is already closed. This plan is the Alpha build. UAT is the script in discovery: route labels, unclear-section tickets, clinical-boundary cases, the leak test, and one RAGAS run on the frozen golden set. The faithfulness bar is 0.8, set before tuning. If the first honest run misses it, UAT has failed and Alpha continues. The bar stays where it is. The golden questions stay as they were written.
 
 Rollout waits until that local UAT has passed. It copies the application shape: the API on Container Apps, PostgreSQL on Azure Database for PostgreSQL, and a model setting in Key Vault. It does not copy the policy extracts, the chunk text, or the embeddings. A cloud copy of the page text is outside the arrangement recorded in discovery. The Azure database at rollout can hold the empty section rows. It does not hold the corpus, so that deployment does not answer policy questions. It proves the containers still fit together.
 
@@ -62,14 +62,14 @@ flowchart TB
 
 ## 2. What is built, in order
 
-The corpus comes before application code. One question then works end to end before Azure and before a second interface. The first code cut is one section and one cited answer. Routing, the clarifying question, the ticket, and the clinical signpost follow. The leak test and the evaluation run are added once that path exists.
+The corpus comes before application code. One question then works end to end before Azure and before a second interface. The first code cut is one section and one cited answer. Routing, the ticket, and the clinical signpost follow. The leak test and the evaluation run are added once that path exists.
 
 ```mermaid
 flowchart LR
     s1[1. Corpus]
     s2[2. Minimal RAG]
     s3[3. Routing]
-    s4[4. Clarify and escalate]
+    s4[4. Escalate and clinical boundary]
     s5[5. Isolation]
     s6[6. Evaluation]
     s7[7. Docker UAT]
@@ -83,7 +83,7 @@ flowchart LR
 | 1. Corpus | Official sources gathered, extracted, cleaned, and assigned to a section. One metadata row each. Local check that every file sits in the folder for its section id | Each section holds a small set of authoritative pages, about five to ten. No page text is in git. Overlapping words from the leak test appear in more than one section |
 | 2. Minimal RAG | The virtual environment, Docker Compose, PostgreSQL with pgvector, the local model, and one path: question, retrieve, cited answer | A container starts, and the model answers a prompt that contains no policy text. An Appointments question whose section is already known returns an answer and that document’s URL |
 | 3. Routing | Question, then section, then retrieval limited to that section | “How can I change my hospital appointment?” is routed to Appointments and is not answered from another section |
-| 4. Clarify, escalate, clinical boundary | The one clarifying question, the second turn, both ticket reasons, and the clinical signpost | “I’ve been referred but haven’t heard anything about my appointment” asks once. An unclear reply, and a missing wait, each open a ticket. “What does this test result mean for me?” signposts and states no clinical advice |
+| 4. Escalate and clinical boundary | Both ticket reasons and the clinical signpost | “I’ve been referred but haven’t heard anything about my appointment” opens a ticket with no section. A missing wait opens a ticket for that section. “What does this test result mean for me?” signposts and states no clinical advice |
 | 5. Isolation | Retrieval filtered by `section_id`, checked on all six directed pairs | An Appointments query returns no Referrals & Waiting or Records & Results passage, and the same for the other pairs |
 | 6. Evaluation | The frozen golden set, then the measures in [evaluation.md](evaluation.md) | The set was written from the pages before any model answer was inspected. Faithfulness on should-answer rows is at least 0.8 |
 | 7. Docker UAT | The discovery script, run against Docker | Every acceptance criterion is shown, including one RAGAS run |
@@ -104,7 +104,6 @@ flowchart TB
             graph[LangGraph]
             clinical[Clinical boundary]
             route[Route]
-            clarify[Clarify]
             retrieve[Retrieve]
             grade[Grade]
             draft[Draft]
@@ -112,7 +111,6 @@ flowchart TB
             ticket[Ticket]
             graph --> clinical
             graph --> route
-            graph --> clarify
             graph --> retrieve
             graph --> grade
             graph --> draft
@@ -145,8 +143,8 @@ flowchart TB
 
 | Component | Lives in | Why this component |
 |---|---|---|
-| API | API container | One front door. It receives text and returns a cited answer, one clarifying question, a ticket, or a signpost. It does not choose the section. |
-| LangGraph | Inside the API process | Discovery gives the graph the clinical refusal, the route, the single clarifying question, retrieval, the grounding check, and the ticket. The branches in the Alpha sequence are edges in this graph. |
+| API | API container | One front door. It receives text and returns a cited answer, a ticket, or a signpost. It does not choose the section. |
+| LangGraph | Inside the API process | Discovery gives the graph the clinical refusal, the route, retrieval, the grounding check, and the ticket. The branches in the Alpha sequence are edges in this graph. |
 | Ingest job | A command in the same codebase, run once | The pages are extracted once into the corpus folders. Ingest splits those files, embeds them, and writes chunks with the section id from metadata. It is not called when a person asks a question. |
 | PostgreSQL | Its own container | Sections, chunks, tickets, and eval runs need one store. The leak test is a filtered read: this section’s passages only. |
 | Eval runner | Its own container, started by hand | It scores the frozen golden set and calls the same graph. It is not on the request path, so a request never waits for RAGAS. |
@@ -154,7 +152,7 @@ flowchart TB
 
 ### The graph
 
-The sequence in alpha is what the person sees. The graph is finer, because the rehearsed stack gives each decision its own step: refuse clinical advice, route, ask once, retrieve, grade, generate, check, escalate.
+The sequence in alpha is what the person sees. The graph is finer, because the rehearsed stack gives each decision its own step: refuse clinical advice, route, retrieve, grade, generate, check, escalate.
 
 ```mermaid
 flowchart TD
@@ -162,8 +160,6 @@ flowchart TD
     clinical{Clinical advice?}
     signpost[Signpost, no clinical advice]
     route{Section clear?}
-    clarify[Send one fixed clarifying question]
-    reply{Reply names one section?}
     ticketUnclear[Ticket, no section]
     retrieve[Read passages for that section only]
     grade[Keep passages that bear on the question]
@@ -176,10 +172,7 @@ flowchart TD
     clinical -->|Yes| signpost
     clinical -->|No| route
     route -->|Yes| retrieve
-    route -->|No| clarify
-    clarify --> reply
-    reply -->|No| ticketUnclear
-    reply -->|Yes| retrieve
+    route -->|No| ticketUnclear
     retrieve --> grade --> draft --> check
     check -->|Yes| answer
     check -->|No| ticketGap
@@ -188,20 +181,16 @@ flowchart TD
 | Step | Who decides | Why it is separate |
 |---|---|---|
 | Clinical boundary | The chat model is asked whether the question seeks a diagnosis, a treatment, or an interpretation of symptoms or results. The graph treats a yes as a stop. | The stop happens before retrieval. A policy passage must not be turned into clinical advice. The signpost is fixed wording, not a model-written opinion. |
-| Route | The chat model returns a section id, or “unclear”. The graph accepts only `appointments`, `referrals_waiting`, `records_results`, or unclear. | The model suggests. The graph refuses any other label, so a guessed section cannot pass as a route. |
-| Clarify | The graph, using a fixed sentence. | The sentence names Appointments, Referrals & Waiting, and Records & Results, and states no policy. A model-written question could quote a rule. The fixed sentence cannot. One edge leads here. No edge leads back. |
-| Second turn | The chat model reads the reply. The graph again accepts only one of the three ids, or unclear. | A reply that names a section is routed. A reply that does not is a ticket with no section. The person is not asked again. |
+| Route | The chat model returns a section id, or “unclear”. The graph accepts only `appointments`, `referrals_waiting`, `records_results`, or unclear. | The model suggests. The graph refuses any other label, so a guessed section cannot pass as a route. An unclear label opens a ticket with no section. The person is not asked to choose. |
 | Retrieve | LangChain, against PostgreSQL. No model. | Passages are loaded only for the chosen `section_id`, and only from documents in the approved corpus. This is the leak-test boundary. |
 | Grade | The chat model marks each passage as useful or not. | Shared words such as “appointment”, “referral”, “result”, “waiting”, “patient”, “GP”, and “hospital” pull in neighbouring sentences. Grading leaves the draft with the passages that bear on the question. |
 | Draft | The chat model, given only the graded passages. | The answer is written from that section’s text. The source URL on the chunk is the citation. |
 | Check | The chat model, asked whether every claim in the draft is present in those passages. The graph treats a failed check as a stop. | This is the grounding check. A wait, a step, or a rule that is not in the passage becomes a ticket instead of an answer. The ticket says the guidance is insufficient. |
-| Ticket | The graph writes the row. | The reason is chosen by the branch: the section was still unclear, or the pages do not support an answer. The model does not invent the reason. |
-
-The clarifying sentence is fixed when the code is written. The discovery example is the starting wording: the person is asked whether this is about an appointment, a referral or waiting, or records and results.
+| Ticket | The graph writes the row. | The reason is chosen by the branch: the section was not clear, or the pages do not support an answer. The model does not invent the reason. |
 
 The signpost is fixed when the code is written. It directs the person to an appropriate healthcare professional or service, such as their GP, the clinician responsible for their care, or NHS 111. It does not add a diagnosis, a treatment, or an interpretation.
 
-The second turn does not need a stored session. UAT sends the original question, the clarifying question, and the scripted reply together. The ticket is the record that outlives the call. A chat session can wait until a second interface exists, which is after this Alpha.
+The ticket is the record that outlives the call. One request carries one question. A stored chat session is not part of this Alpha.
 
 ## 4. Libraries
 
@@ -217,7 +206,7 @@ The versions are pinned when the environment is created. They are not pinned in 
 | FastAPI | API | One typed HTTP entry. The endings are response shapes the tests can tell apart. |
 | Uvicorn | API | The process that serves FastAPI inside the API container. |
 | Pydantic | API | Describes the question and the responses. FastAPI already uses it, so the contract and the validation are the same objects. |
-| LangGraph | Graph | Required by the role being rehearsed. It owns the edges: clinical stop, one clarifying question, no second question, ticket as the stop. |
+| LangGraph | Graph | Required by the role being rehearsed. It owns the edges: clinical stop, route, ticket as the stop. |
 | LangChain | Ingest, embeddings, retrieval | Required by the same role for loading, splitting, embedding, and retrieval. |
 | langchain-text-splitters | Ingest | Splits the page text into passages. The pages are prose. The splitter keeps a paragraph together before it cuts by length. |
 | langchain-postgres | Retrieval | The LangChain retriever that talks to PostgreSQL. The filter is `section_id`. |
@@ -230,7 +219,7 @@ The versions are pinned when the environment is created. They are not pinned in 
 | Library | Component it serves | Why this library |
 |---|---|---|
 | RAGAS | Eval runner | Required for faithfulness and context precision. It is run by hand on the golden set. |
-| pytest | UAT checks that do not need a judge model | Route labels, the two-turn cases, the endings, and the leak test are ordinary assertions. They do not need RAGAS. |
+| pytest | UAT checks that do not need a judge model | Route labels, the ticket endings, and the leak test are ordinary assertions. They do not need RAGAS. |
 | httpx | Those same checks | Calls the API the way a person would, against the Docker process. |
 
 ### Runtime images
@@ -243,7 +232,7 @@ The versions are pinned when the environment is created. They are not pinned in 
 
 ### Starting model names
 
-The names live in configuration so they can be replaced without a change to the graph. The model is a component. The experiment is the orchestration: route, then retrieval constrained to one section, then evidence, then an answer, a clarifying question, or an escalation. A larger model is not the subject of the project. RAG quality is not treated as solved by swapping in a bigger model.
+The names live in configuration so they can be replaced without a change to the graph. The model is a component. The experiment is the orchestration: route, then retrieval constrained to one section, then evidence, then an answer or an escalation. A larger model is not the subject of the project. RAG quality is not treated as solved by swapping in a bigger model.
 
 | Setting | Starting value | Why this starting value |
 |---|---|---|
@@ -317,13 +306,13 @@ This is the layout the code will follow. The files are not created yet. The pack
 | Path | What will be in it | Why it is its own place |
 |---|---|---|
 | `src/deskline/api/` | The HTTP entry and the response shapes | The front door stays thin. The decisions stay in the graph. |
-| `src/deskline/router/` | The clinical check, the section label, and the one clarifying question | One place owns “ask once” and the allowed section ids. |
+| `src/deskline/router/` | The clinical check and the section label | One place owns the allowed section ids. |
 | `src/deskline/retrieval/` | Load the corpus, split, embed, write chunks, and the filtered retriever | The `section_id` filter lives next to the queries. |
 | `src/deskline/generation/` | Grade, draft, and the grounding check | The answer is written only from graded passages. |
 | `src/deskline/escalation/` | The ticket, the insufficient-guidance wording, and the clinical signpost | Ticket is the stop. The model does not invent the reason. |
 | `src/deskline/evaluation/` | Route scores, the unsupported-answer rate, and the RAGAS run | The eval runner. Started by hand. |
 | `eval/golden.json` | The frozen questions, labels, and expected endings | Committed. It holds questions written from the pages. It does not hold page text. |
-| `tests/routing/` | Route labels and two-turn cases | A1, A5, and A6. |
+| `tests/routing/` | Route labels and unclear-section tickets | A1, A5, and A6. |
 | `tests/retrieval/` | Citation and approved-corpus checks | A2, A3, and A9. |
 | `tests/leakage/` | The six directed pairs | A7. |
 | `tests/uat/` | The endings, including signpost and insufficient guidance | A4, A8, and A10, run against Docker. |
@@ -336,28 +325,26 @@ A class diagram is still not drawn. It will be taken from these files after they
 
 ## 7. What the API accepts and returns
 
-One entry accepts a question. When the first response was a clarifying question, the next call includes that question and the person’s reply. The graph then takes the second-turn branch.
+One entry accepts one question and returns one result.
 
 | Call | Sent | Returned |
 |---|---|---|
-| First turn, clinical advice | The question | A signpost. No citation, no ticket section, and no clinical advice |
-| First turn, section already clear | The question | An answer, the section id, and the source URL |
-| First turn, section unclear | The question | One clarifying question. No citation and no ticket |
-| Second turn, a section was named | The original question, the clarifying question, and the reply | An answer with a citation, or a ticket for that section |
-| Second turn, still unclear | The original question, the clarifying question, and the reply | A ticket with no section and no policy |
-| First turn, no section applies | The question, for example a job application | A ticket with no section |
-| First turn, right section, missing fact | The question | A ticket for that section, stating that the guidance is insufficient |
+| Clinical advice | The question | A signpost. No citation, no ticket section, and no clinical advice |
+| Section already clear | The question | An answer, the section id, and the source URL |
+| Section not clear | The question | A ticket with no section and no policy |
+| No section applies | The question, for example a job application | A ticket with no section |
+| Right section, missing fact | The question | A ticket for that section, stating that the guidance is insufficient |
 
 | Ticket fields | Why they are stored |
 |---|---|
 | Section id, when one was chosen | Section staff can see whose queue it is. Empty when the section never became clear. |
-| Question | The person’s reply needs the original wording. |
+| Question | The ticket needs the original wording. |
 | Passage ids | The passages that were considered can be opened and checked. |
-| Reason | Either the section was still unclear, or the pages do not support an answer. |
+| Reason | Either the section was not clear, or the pages do not support an answer. |
 
 ## 8. Golden set
 
-The golden set is specified in [evaluation.md](evaluation.md). It is about twenty questions, written from the approved pages before any model output is inspected, then left fixed. Clear routes, ambiguous two-turn cases, cross-domain cases, answerable cases, unsupported cases, escalations, and clinical-boundary cases are included.
+The golden set is specified in [evaluation.md](evaluation.md). It is about twenty questions, written from the approved pages before any model output is inspected, then left fixed. Clear routes, ambiguous cases, cross-domain cases, answerable cases, unsupported cases, escalations, and clinical-boundary cases are included.
 
 RAGAS faithfulness of at least 0.8 applies to the rows marked should-answer. Routing accuracy, citation correctness, the unsupported-answer rate, and leakage are recorded on the same run. Escalation and clinical rows are checked for a stop, not for a fluent answer.
 
@@ -369,9 +356,9 @@ UAT is run against the Docker Compose stack, not against an uncommitted half of 
 
 | Criterion | How it is shown |
 |---|---|
-| A1. The route matches the label, and a clear question is not asked to clarify | pytest sends the golden item and compares the section id |
+| A1. The route matches the label | pytest sends the golden item and compares the section id |
 | A2, A3. An in-policy question returns evidence and the source URL from that section | pytest checks that the body cites a retrieved URL, and that the URL’s section matches the route |
-| A5, A6. One clarifying question, then a ticket if the reply names nothing | pytest checks the first body for a question and an empty ticket, then the second body for a ticket and an empty section |
+| A5, A6. An unclear section is a ticket with no section and no policy | pytest checks the body for a ticket and an empty section |
 | A4, A10. A gap in the right section is a ticket, and the gap is stated | pytest checks the section id, that the body claims no missing rule, and that it says the guidance is insufficient |
 | A7. No foreign passage | The leak test calls retrieval directly, for all six pairs, and asserts one `section_id` |
 | A8. No clinical advice | pytest checks the signpost body for the absence of a diagnosis, a treatment, or an interpretation |
@@ -399,6 +386,6 @@ Kubernetes is out of scope. Container Apps is the rollout target named in discov
 
 - The class diagram.
 - The chunk length. It will be chosen on the first ingest, then changed only with a before-and-after eval run.
-- The fixed clarifying sentence and the fixed signpost, beyond the starting wording in this plan.
+- The fixed signpost, beyond the starting wording in this plan.
 - The particular official URLs. They are chosen in the corpus sprint and recorded in metadata.
-- A second interface, a stored chat session, and any Azure spend.
+- A second interface and any Azure spend.

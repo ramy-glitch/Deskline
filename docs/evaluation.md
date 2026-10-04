@@ -17,7 +17,7 @@ Clinical-boundary handling is judged with the unsupported and escalation cases. 
 
 | Measure | Question it asks | Passed when |
 |---|---|---|
-| Routing accuracy | Did Deskline select the section written on the golden question? | The section id matches the label. A clear question is not sent through clarification. |
+| Routing accuracy | Did Deskline select the section written on the golden question? | The section id matches the label. A question that is not one clear section is a ticket, not an answer. |
 | Retrieval correctness | Did the passages come from that section’s documents? | Every retrieved passage carries the routed section id, and the document is in the approved corpus. |
 | Faithfulness | Are the claims in the answer present in those passages? | RAGAS faithfulness is at least 0.8 on the rows marked should-answer. |
 | Citation correctness | Does the answer name the source that supports the claims? | The cited URL is the URL of a retrieved passage from that section. |
@@ -38,9 +38,9 @@ The set is built around failure modes. The correct behaviour is not always “an
 
 | Category | Target count | Correct behaviour |
 |---|---:|---|
-| Clear routing | 6 | Route to the one obvious section. Do not ask a clarifying question. |
-| Ambiguous routing | 4 | Ask one clarifying question. State no policy. |
-| Cross-domain | 3 | Do not merge corpora. Ask once, or escalate if the reply names no single section. |
+| Clear routing | 6 | Route to the one obvious section and answer it. |
+| Ambiguous routing | 4 | Open a ticket with no section. State no policy. |
+| Cross-domain | 3 | Do not merge corpora. Open a ticket with no section. |
 | Answerable | 3 | Return a cited answer from the routed section. |
 | Unsupported | 2 | Refuse. Say the guidance is insufficient. Do not invent the missing fact. |
 | Escalation | 2 | Open a ticket for a person. |
@@ -60,11 +60,10 @@ The stored fields are:
 
 | Field | Purpose |
 |---|---|
-| Question | The text sent on the first turn |
+| Question | The text sent |
 | Section label | `appointments`, `referrals_waiting`, `records_results`, `none`, or `clinical`. Written in advance |
 | Category | One of the rows in the table above, or `clinical` |
-| Expected ending | Answer, one clarifying question, ticket, or signpost |
-| Scripted reply | Present only on two-turn cases |
+| Expected ending | Answer, ticket, or signpost |
 | Should answer | Yes when RAGAS faithfulness applies. No on escalation, unsupported, and clinical cases |
 
 An eval-run row stores what was changed and the measures in the sequence above. That row is the result. It is not a copy of the questions, and it does not contain page text.
