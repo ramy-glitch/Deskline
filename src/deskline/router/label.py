@@ -40,11 +40,12 @@ def section_label(question: str) -> SectionLabel:
     structured = model.with_structured_output(SectionLabel)
     try:
         result = structured.invoke(
-            "Choose one section for this question.\n"
-            "appointments: booking or changing an appointment.\n"
-            "referrals_waiting: a referral or a waiting time.\n"
-            "records_results: health records or test results.\n"
-            "unclear: more than one of those, or none of them.\n\n"
+            "Choose exactly one label for the question.\n"
+            "appointments: the question is only about booking or changing an appointment.\n"
+            "referrals_waiting: the question is only about a referral or a waiting time.\n"
+            "records_results: the question is only about health records or test results.\n"
+            "unclear: the question fits more than one section, or it fits none of them.\n"
+            "Do not guess a section. A question that is not about these processes is unclear.\n\n"
             f"Question: {question}"
         )
     except Exception:
@@ -57,4 +58,3 @@ def section_label(question: str) -> SectionLabel:
 if __name__ == "__main__":
     label = section_label("How can I change my hospital appointment?")
     print(label.model_dump())
-    
