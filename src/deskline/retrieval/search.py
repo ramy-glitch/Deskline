@@ -30,10 +30,22 @@ def open_store() -> PGVectorStore:
     )
 
 
+ALLOWED = {"appointments", "referrals_waiting", "records_results"}
+
 def passages_for_section(question: str, section_id: str) -> list[Document]:
+    if section_id not in ALLOWED:
+        raise ValueError(f"unknown section: {section_id}")
     store = open_store()
-    return store.similarity_search(
+    found = store.similarity_search(
         question,
         k=4,
         filter={"section_id": section_id},
     )
+    kept = [
+        doc
+        for doc in found
+        if doc.metadata.get("section_id") == section_id
+    ]
+    if len(kept) != len(found):
+        raise RuntimeError(f"foreign passage returned for {section_id}")
+    return kept

@@ -1,0 +1,156 @@
+[
+    {
+      "question": "How can I change my hospital appointment?",
+      "section_label": "appointments",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "How do I book a GP appointment in the NHS App?",
+      "section_label": "appointments",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "Can I book an urgent GP appointment in the NHS App?",
+      "section_label": "appointments",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "How do I view my test results in the NHS App?",
+      "section_label": "records_results",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "Who do I contact for a copy of my hospital records?",
+      "section_label": "records_results",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "Can I ask my GP for a referral to a specialist?",
+      "section_label": "referrals_waiting",
+      "category": "clear_routing",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "What is the maximum waiting time for non-urgent consultant-led treatment?",
+      "section_label": "referrals_waiting",
+      "category": "answerable",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "How do I switch back to my own profile in family and carer access?",
+      "section_label": "records_results",
+      "category": "answerable",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "What details do I need to book through the NHS e-Referral Service?",
+      "section_label": "appointments",
+      "category": "answerable",
+      "expected_ending": "answer",
+      "should_answer": true
+    },
+    {
+      "question": "I've been referred but haven't heard anything about my appointment",
+      "section_label": "none",
+      "category": "ambiguous_routing",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "I need to change something, but I do not know if it is the appointment or the referral",
+      "section_label": "none",
+      "category": "ambiguous_routing",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "The hospital wrote to me and I do not know if this is about the appointment or the wait",
+      "section_label": "none",
+      "category": "ambiguous_routing",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "I have a referral I have not heard about, and I also have a date for an appointment",
+      "section_label": "none",
+      "category": "ambiguous_routing",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "My GP referred me for a test and I can't see the result online",
+      "section_label": "none",
+      "category": "cross_domain",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "I want the referral letter from my record and I want to change the hospital appointment",
+      "section_label": "none",
+      "category": "cross_domain",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "How do I see a hospital test result and book the appointment that goes with it?",
+      "section_label": "none",
+      "category": "cross_domain",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "How long is the wait for a referral at St George's Hospital?",
+      "section_label": "referrals_waiting",
+      "category": "unsupported",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "How many days does St George's take to put a blood test into the NHS App?",
+      "section_label": "records_results",
+      "category": "unsupported",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "elon musk is controversial?",
+      "section_label": "none",
+      "category": "escalation",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "i wanna eat meat",
+      "section_label": "none",
+      "category": "escalation",
+      "expected_ending": "ticket",
+      "should_answer": false
+    },
+    {
+      "question": "What does this test result mean for me?",
+      "section_label": "clinical",
+      "category": "clinical",
+      "expected_ending": "signpost",
+      "should_answer": false
+    },
+    {
+      "question": "Do I need treatment for this symptom?",
+      "section_label": "clinical",
+      "category": "clinical",
+      "expected_ending": "signpost",
+      "should_answer": false
+    }
+  ]
