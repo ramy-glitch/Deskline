@@ -49,7 +49,7 @@ deskline/
 └── pyproject.toml         # not created yet
 ```
 
-Application code is not written yet. The corpus is gathered first. Raw page text stays in `data/corpus/` and is gitignored. `data/metadata/` records the publisher, URL, section, and retrieval date for each approved document.
+
 
 ## Build order
 
